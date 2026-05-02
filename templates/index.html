@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Depression Sentiment Analyzer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f4f8;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 50px 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .brain-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+
+        .input-section {
+            margin-bottom: 25px;
+        }
+
+        .input-section label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 120px;
+            color: #2d3748;
+            transition: border-color 0.3s;
+            outline: none;
+        }
+
+        textarea:focus {
+            border-color: #667eea;
+        }
+
+        textarea::placeholder {
+            color: #a0aec0;
+        }
+
+        .analyze-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            letter-spacing: 0.5px;
+        }
+
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102,126,234,0.4);
+        }
+
+        .analyze-btn:active {
+            transform: translateY(0);
+        }
+
+        .analyze-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-section {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .result-card {
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .result-card.positive {
+            background: #f0fff4;
+            border: 2px solid #9ae6b4;
+        }
+
+        .result-card.neutral {
+            background: #fffbf0;
+            border: 2px solid #fbd38d;
+        }
+
+        .result-card.negative {
+            background: #fff5f5;
+            border: 2px solid #feb2b2;
+        }
+
+        .result-emoji {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+
+        .result-label {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .result-card.positive .result-label { color: #276749; }
+        .result-card.neutral .result-label { color: #744210; }
+        .result-card.negative .result-label { color: #742a2a; }
+
+        .result-message {
+            font-size: 15px;
+            color: #718096;
+            line-height: 1.6;
+        }
+
+        .loading {
+            text-align: center;
+            color: #718096;
+            font-size: 15px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .error-message {
+            background: #fff5f5;
+            border: 2px solid #feb2b2;
+            border-radius: 12px;
+            padding: 15px;
+            color: #742a2a;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #a0aec0;
+            font-size: 13px;
+        }
+
+        .divider {
+            height: 1px;
+            background: #e2e8f0;
+            margin: 30px 0;
+        }
+
+        .try-examples {
+            margin-top: 20px;
+        }
+
+        .try-examples p {
+            font-size: 13px;
+            color: #718096;
+            margin-bottom: 10px;
+        }
+
+        .example-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .chip {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 13px;
+            color: #4a5568;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .chip:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="brain-icon">🧠</div>
+            <h1>Depression Sentiment Analyzer</h1>
+            <p>Type any sentence or tweet below and our AI will analyze whether it shows positive, neutral, or negative sentiment.</p>
+        </div>
+
+        <div class="input-section">
+            <label>Enter your tweet or sentence:</label>
+            <textarea 
+                id="tweetInput" 
+                placeholder="e.g. I feel so sad and hopeless today..."
+            ></textarea>
+        </div>
+
+        <button class="analyze-btn" onclick="analyzeTweet()" id="analyzeBtn">
+            🔍 Analyze Sentiment
+        </button>
+
+        <div class="try-examples">
+            <p>Try an example:</p>
+            <div class="example-chips">
+                <span class="chip" onclick="setExample('I feel so sad and hopeless today')">😔 Sad tweet</span>
+                <span class="chip" onclick="setExample('I am so happy and grateful today!')">😊 Happy tweet</span>
+                <span class="chip" onclick="setExample('Today was just a normal day')">😐 Neutral tweet</span>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            ⏳ Analyzing your text...
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+
+        <div class="result-section" id="resultSection">
+            <div class="divider"></div>
+            <div class="result-card" id="resultCard">
+                <div class="result-emoji" id="resultEmoji"></div>
+                <div class="result-label" id="resultLabel"></div>
+                <div class="result-message" id="resultMessage"></div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Built with Python & Machine Learning 🤖</p>
+        </div>
+    </div>
+
+    <script>
+        function setExample(text) {
+            document.getElementById('tweetInput').value = text;
+        }
+
+        async function analyzeTweet() {
+            const tweet = document.getElementById('tweetInput').value.trim();
+            
+            if (!tweet) {
+                showError('Please enter some text first!');
+                return;
+            }
+
+            const btn = document.getElementById('analyzeBtn');
+            const loading = document.getElementById('loading');
+            const resultSection = document.getElementById('resultSection');
+            const errorMessage = document.getElementById('errorMessage');
+
+            btn.disabled = true;
+            btn.textContent = 'Analyzing...';
+            loading.style.display = 'block';
+            resultSection.style.display = 'none';
+            errorMessage.style.display = 'none';
+
+            try {
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tweet: tweet })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    showError(data.error);
+                } else {
+                    showResult(data);
+                }
+
+            } catch (error) {
+                showError('Something went wrong. Please try again!');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🔍 Analyze Sentiment';
+                loading.style.display = 'none';
+            }
+        }
+
+        function showResult(data) {
+            const resultSection = document.getElementById('resultSection');
+            const resultCard = document.getElementById('resultCard');
+            const resultEmoji = document.getElementById('resultEmoji');
+            const resultLabel = document.getElementById('resultLabel');
+            const resultMessage = document.getElementById('resultMessage');
+
+            resultCard.className = 'result-card ' + data.color;
+            resultEmoji.textContent = data.emoji;
+            resultLabel.textContent = data.result;
+            resultMessage.textContent = data.message;
+
+            resultSection.style.display = 'block';
+        }
+
+        function showError(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+        }
+
+        document.getElementById('tweetInput').addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                analyzeTweet();
+            }
+        });
+    </script>
+</body>
+</html>

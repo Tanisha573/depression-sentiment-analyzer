@@ -1,0 +1,20 @@
+{"id": 1, "id_str": "1", "text": "I feel so sad and hopeless today, nothing makes me happy anymore"}
+{"id": 2, "id_str": "2", "text": "Feeling great today! Life is beautiful and wonderful"}
+{"id": 3, "id_str": "3", "text": "I have been feeling anxious and stressed about everything lately"}
+{"id": 4, "id_str": "4", "text": "Today was an amazing day full of joy and happiness"}
+{"id": 5, "id_str": "5", "text": "I cannot stop crying, depression is taking over my life"}
+{"id": 6, "id_str": "6", "text": "Feeling neutral about everything, just another ordinary day"}
+{"id": 7, "id_str": "7", "text": "I am so happy and grateful for everything in my life"}
+{"id": 8, "id_str": "8", "text": "Anxiety and depression are ruining my life, I feel so alone"}
+{"id": 9, "id_str": "9", "text": "What a wonderful morning, feeling blessed and positive"}
+{"id": 10, "id_str": "10", "text": "I feel empty inside, nothing brings me joy anymore"}
+{"id": 11, "id_str": "11", "text": "Life is good today, spending time with family and friends"}
+{"id": 12, "id_str": "12", "text": "Feeling very depressed and lonely, nobody understands me"}
+{"id": 13, "id_str": "13", "text": "Just had the best day ever, everything is going great"}
+{"id": 14, "id_str": "14", "text": "I am struggling with dark thoughts and sadness every day"}
+{"id": 15, "id_str": "15", "text": "Feeling okay today, nothing special just a regular day"}
+{"id": 16, "id_str": "16", "text": "So grateful and happy, life could not be better right now"}
+{"id": 17, "id_str": "17", "text": "Depression hits hard today, feeling worthless and hopeless"}
+{"id": 18, "id_str": "18", "text": "Had a productive day, feeling accomplished and satisfied"}
+{"id": 19, "id_str": "19", "text": "Feeling so low and miserable, stress and anxiety everywhere"}
+{"id": 20, "id_str": "20", "text": "Today is a beautiful day, feeling happy and energetic"}
