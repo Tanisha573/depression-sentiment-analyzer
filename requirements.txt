@@ -1,4 +1,6 @@
 flask
+flask-sqlalchemy
+werkzeug
 pandas
 numpy
 scikit-learn
