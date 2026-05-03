@@ -1,357 +1,842 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Depression Sentiment Analyzer</title>
+    <title>MindX - Mental Health Analyzer</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #000000;
+            --bg-secondary: #16181c;
+            --bg-hover: #1d1f23;
+            --bg-card: #16181c;
+            --border: #2f3336;
+            --text-primary: #e7e9ea;
+            --text-secondary: #71767b;
+            --accent: #1d9bf0;
+            --accent-hover: #1a8cd8;
+            --positive-bg: #0d2a1f;
+            --positive-border: #1a4731;
+            --positive-text: #4ade80;
+            --neutral-bg: #2a2200;
+            --neutral-border: #4a3800;
+            --neutral-text: #fbbf24;
+            --negative-bg: #2a0d0d;
+            --negative-border: #4a1a1a;
+            --negative-text: #f87171;
+            --helpline-bg: #0d1a2a;
+            --helpline-border: #1a3a5c;
+            --tip-bg: #0d2a1f;
+            --tip-border: #1a4731;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f7f9f9;
+            --bg-hover: #eff3f4;
+            --bg-card: #ffffff;
+            --border: #cfd9de;
+            --text-primary: #0f1419;
+            --text-secondary: #536471;
+            --accent: #1d9bf0;
+            --accent-hover: #1a8cd8;
+            --positive-bg: #f0fff4;
+            --positive-border: #9ae6b4;
+            --positive-text: #276749;
+            --neutral-bg: #fffbf0;
+            --neutral-border: #fbd38d;
+            --neutral-text: #744210;
+            --negative-bg: #fff5f5;
+            --negative-border: #feb2b2;
+            --negative-text: #742a2a;
+            --helpline-bg: #eff8ff;
+            --helpline-border: #90cdf4;
+            --tip-bg: #f0fff4;
+            --tip-border: #9ae6b4;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f0f4f8;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             min-height: 100vh;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 53px;
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            z-index: 100;
+        }
+
+        .nav-logo {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-logo span {
+            color: var(--accent);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 6px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+        }
+
+        .theme-toggle:hover {
+            background: var(--bg-hover);
+        }
+
+        /* MAIN LAYOUT */
+        .main-layout {
+            max-width: 600px;
+            margin: 0 auto;
+            padding-top: 53px;
+        }
+
+        /* COMPOSER */
+        .composer {
+            border-bottom: 1px solid var(--border);
+            padding: 12px 16px;
+        }
+
+        .composer-header {
+            font-size: 20px;
+            font-weight: 700;
+            padding: 12px 0;
+            color: var(--text-primary);
+        }
+
+        .composer-body {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), #7856ff);
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            font-size: 18px;
+            flex-shrink: 0;
         }
 
-        .container {
-            background: white;
-            border-radius: 20px;
-            padding: 50px 40px;
-            max-width: 600px;
-            width: 100%;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .header h1 {
-            font-size: 28px;
-            color: #2d3748;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-
-        .header p {
-            color: #718096;
-            font-size: 15px;
-            line-height: 1.6;
-        }
-
-        .brain-icon {
-            font-size: 50px;
-            margin-bottom: 15px;
-        }
-
-        .input-section {
-            margin-bottom: 25px;
-        }
-
-        .input-section label {
-            display: block;
-            font-size: 14px;
-            font-weight: 600;
-            color: #4a5568;
-            margin-bottom: 10px;
+        .composer-right {
+            flex: 1;
         }
 
         textarea {
             width: 100%;
-            padding: 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 15px;
-            font-family: inherit;
-            resize: vertical;
-            min-height: 120px;
-            color: #2d3748;
-            transition: border-color 0.3s;
+            background: transparent;
+            border: none;
             outline: none;
-        }
-
-        textarea:focus {
-            border-color: #667eea;
+            color: var(--text-primary);
+            font-size: 20px;
+            font-family: inherit;
+            resize: none;
+            min-height: 100px;
+            line-height: 1.5;
         }
 
         textarea::placeholder {
-            color: #a0aec0;
+            color: var(--text-secondary);
+        }
+
+        .composer-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .composer-tools {
+            display: flex;
+            gap: 4px;
+        }
+
+        .tool-btn {
+            background: none;
+            border: none;
+            color: var(--accent);
+            padding: 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .tool-btn:hover {
+            background: rgba(29, 155, 240, 0.1);
+        }
+
+        .composer-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .char-count {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .char-count.warning {
+            color: #fbbf24;
+        }
+
+        .char-count.danger {
+            color: #f87171;
         }
 
         .analyze-btn {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--accent);
             color: white;
             border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 15px;
+            font-weight: 700;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            letter-spacing: 0.5px;
+            font-family: inherit;
         }
 
         .analyze-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102,126,234,0.4);
-        }
-
-        .analyze-btn:active {
-            transform: translateY(0);
+            background: var(--accent-hover);
         }
 
         .analyze-btn:disabled {
-            opacity: 0.7;
+            opacity: 0.5;
             cursor: not-allowed;
-            transform: none;
         }
 
+        /* EXAMPLE POSTS */
+        .section-label {
+            padding: 12px 16px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .example-posts {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .example-post {
+            display: flex;
+            gap: 12px;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .example-post:hover {
+            background: var(--bg-hover);
+        }
+
+        .post-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .post-content {
+            flex: 1;
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+
+        .post-name {
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .post-handle {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .post-text {
+            font-size: 15px;
+            line-height: 1.5;
+            color: var(--text-primary);
+        }
+
+        .post-tag {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .tag-positive { background: var(--positive-bg); color: var(--positive-text); }
+        .tag-neutral { background: var(--neutral-bg); color: var(--neutral-text); }
+        .tag-negative { background: var(--negative-bg); color: var(--negative-text); }
+
+        /* RESULT */
         .result-section {
-            margin-top: 30px;
             display: none;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .result-post {
+            padding: 16px;
+        }
+
+        .result-post-header {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .result-text {
+            font-size: 18px;
+            line-height: 1.5;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            padding-left: 52px;
         }
 
         .result-card {
+            margin-left: 52px;
             border-radius: 16px;
-            padding: 30px;
+            padding: 20px;
+            border: 1px solid;
             text-align: center;
-            transition: all 0.3s;
         }
 
         .result-card.positive {
-            background: #f0fff4;
-            border: 2px solid #9ae6b4;
+            background: var(--positive-bg);
+            border-color: var(--positive-border);
         }
 
         .result-card.neutral {
-            background: #fffbf0;
-            border: 2px solid #fbd38d;
+            background: var(--neutral-bg);
+            border-color: var(--neutral-border);
         }
 
         .result-card.negative {
-            background: #fff5f5;
-            border: 2px solid #feb2b2;
+            background: var(--negative-bg);
+            border-color: var(--negative-border);
         }
 
-        .result-emoji {
-            font-size: 60px;
-            margin-bottom: 15px;
-        }
+        .result-emoji { font-size: 40px; margin-bottom: 8px; }
 
         .result-label {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 10px;
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 6px;
         }
 
-        .result-card.positive .result-label { color: #276749; }
-        .result-card.neutral .result-label { color: #744210; }
-        .result-card.negative .result-label { color: #742a2a; }
+        .result-card.positive .result-label { color: var(--positive-text); }
+        .result-card.neutral .result-label { color: var(--neutral-text); }
+        .result-card.negative .result-label { color: var(--negative-text); }
 
         .result-message {
-            font-size: 15px;
-            color: #718096;
-            line-height: 1.6;
+            font-size: 14px;
+            color: var(--text-secondary);
         }
 
-        .loading {
-            text-align: center;
-            color: #718096;
-            font-size: 15px;
-            margin-top: 20px;
+        /* HELP SECTION */
+        .help-section {
             display: none;
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
         }
 
-        .error-message {
-            background: #fff5f5;
-            border: 2px solid #feb2b2;
-            border-radius: 12px;
-            padding: 15px;
-            color: #742a2a;
-            text-align: center;
-            margin-top: 20px;
-            display: none;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            color: #a0aec0;
-            font-size: 13px;
-        }
-
-        .divider {
-            height: 1px;
-            background: #e2e8f0;
-            margin: 30px 0;
-        }
-
-        .try-examples {
-            margin-top: 20px;
-        }
-
-        .try-examples p {
-            font-size: 13px;
-            color: #718096;
-            margin-bottom: 10px;
-        }
-
-        .example-chips {
+        .help-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 16px;
             display: flex;
-            flex-wrap: wrap;
+            align-items: center;
             gap: 8px;
         }
 
-        .chip {
-            background: #f7fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 20px;
-            padding: 6px 14px;
-            font-size: 13px;
-            color: #4a5568;
-            cursor: pointer;
-            transition: all 0.2s;
+        .helplines {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 20px;
         }
 
-        .chip:hover {
-            background: #667eea;
+        .helpline-card {
+            background: var(--helpline-bg);
+            border: 1px solid var(--helpline-border);
+            border-radius: 12px;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .helpline-icon {
+            font-size: 24px;
+        }
+
+        .helpline-info h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .helpline-info p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .helpline-number {
+            margin-left: auto;
+            background: var(--accent);
             color: white;
-            border-color: #667eea;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .tips-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tips-grid {
+            display: grid;
+            gap: 10px;
+        }
+
+        .tip-card {
+            background: var(--tip-bg);
+            border: 1px solid var(--tip-border);
+            border-radius: 12px;
+            padding: 14px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .tip-icon { font-size: 22px; flex-shrink: 0; }
+
+        .tip-content h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .tip-content p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* LOADING */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: var(--text-secondary);
+        }
+
+        .loading-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            margin: 0 3px;
+            animation: bounce 1.2s infinite;
+        }
+
+        .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1.2); opacity: 1; }
+        }
+
+        .crisis-banner {
+            background: linear-gradient(135deg, #7856ff, #1d9bf0);
+            border-radius: 16px;
+            padding: 16px;
+            margin: 16px;
+            text-align: center;
+            color: white;
+        }
+
+        .crisis-banner h3 {
+            font-size: 16px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .crisis-banner p {
+            font-size: 13px;
+            opacity: 0.9;
+            margin-bottom: 12px;
+        }
+
+        .crisis-call-btn {
+            background: white;
+            color: #7856ff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="brain-icon">🧠</div>
-            <h1>Depression Sentiment Analyzer</h1>
-            <p>Type any sentence or tweet below and our AI will analyze whether it shows positive, neutral, or negative sentiment.</p>
-        </div>
 
-        <div class="input-section">
-            <label>Enter your tweet or sentence:</label>
-            <textarea 
-                id="tweetInput" 
-                placeholder="e.g. I feel so sad and hopeless today..."
-            ></textarea>
-        </div>
-
-        <button class="analyze-btn" onclick="analyzeTweet()" id="analyzeBtn">
-            🔍 Analyze Sentiment
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-logo">🧠 <span>Mind</span>X</div>
+        <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">
+            🌙 Dark
         </button>
+    </nav>
 
-        <div class="try-examples">
-            <p>Try an example:</p>
-            <div class="example-chips">
-                <span class="chip" onclick="setExample('I feel so sad and hopeless today')">😔 Sad tweet</span>
-                <span class="chip" onclick="setExample('I am so happy and grateful today!')">😊 Happy tweet</span>
-                <span class="chip" onclick="setExample('Today was just a normal day')">😐 Neutral tweet</span>
+    <!-- MAIN -->
+    <div class="main-layout">
+
+        <!-- COMPOSER -->
+        <div class="composer">
+            <div class="composer-header">What's on your mind?</div>
+            <div class="composer-body">
+                <div class="avatar">😊</div>
+                <div class="composer-right">
+                    <textarea 
+                        id="tweetInput" 
+                        placeholder="Share how you're feeling today..."
+                        maxlength="280"
+                        oninput="updateCharCount()"
+                    ></textarea>
+                    <div class="composer-footer">
+                        <div class="composer-tools">
+                            <button class="tool-btn" title="Feeling">😊</button>
+                            <button class="tool-btn" title="Location">📍</button>
+                            <button class="tool-btn" title="Image">🖼️</button>
+                        </div>
+                        <div class="composer-actions">
+                            <span class="char-count" id="charCount">280</span>
+                            <button class="analyze-btn" onclick="analyzeTweet()" id="analyzeBtn">
+                                Analyze
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
+        <!-- LOADING -->
         <div class="loading" id="loading">
-            ⏳ Analyzing your text...
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
         </div>
 
-        <div class="error-message" id="errorMessage"></div>
-
+        <!-- RESULT -->
         <div class="result-section" id="resultSection">
-            <div class="divider"></div>
-            <div class="result-card" id="resultCard">
-                <div class="result-emoji" id="resultEmoji"></div>
-                <div class="result-label" id="resultLabel"></div>
-                <div class="result-message" id="resultMessage"></div>
+            <div class="result-post">
+                <div class="result-post-header">
+                    <div class="avatar">😊</div>
+                    <div>
+                        <div style="font-weight:700;font-size:15px;">You</div>
+                        <div style="color:var(--text-secondary);font-size:14px;">@you · just now</div>
+                    </div>
+                </div>
+                <div class="result-text" id="resultTweetText"></div>
+                <div class="result-card" id="resultCard">
+                    <div class="result-emoji" id="resultEmoji"></div>
+                    <div class="result-label" id="resultLabel"></div>
+                    <div class="result-message" id="resultMessage"></div>
+                </div>
             </div>
         </div>
 
-        <div class="footer">
-            <p>Built with Python & Machine Learning 🤖</p>
+        <!-- HELP SECTION (shows only for negative) -->
+        <div class="help-section" id="helpSection">
+
+            <div class="crisis-banner">
+                <h3>💙 You Are Not Alone</h3>
+                <p>Trained counselors are available 24/7 to help you through this.</p>
+                <a href="tel:iCall" class="crisis-call-btn">📞 Call Now — It's Free</a>
+            </div>
+
+            <div style="margin-top:20px;">
+                <div class="help-title">📞 Indian Helplines</div>
+                <div class="helplines">
+                    <div class="helpline-card">
+                        <div class="helpline-icon">🏥</div>
+                        <div class="helpline-info">
+                            <h4>iCall — TISS</h4>
+                            <p>Professional counseling, Mon–Sat 8am–10pm</p>
+                        </div>
+                        <a href="tel:9152987821" class="helpline-number">9152987821</a>
+                    </div>
+                    <div class="helpline-card">
+                        <div class="helpline-icon">💚</div>
+                        <div class="helpline-info">
+                            <h4>Vandrevala Foundation</h4>
+                            <p>24/7 Mental health support, Free & confidential</p>
+                        </div>
+                        <a href="tel:18602662345" class="helpline-number">1860-2662-345</a>
+                    </div>
+                    <div class="helpline-card">
+                        <div class="helpline-icon">🌸</div>
+                        <div class="helpline-info">
+                            <h4>Snehi</h4>
+                            <p>Emotional support helpline</p>
+                        </div>
+                        <a href="tel:044-24640050" class="helpline-number">044-24640050</a>
+                    </div>
+                    <div class="helpline-card">
+                        <div class="helpline-icon">🆘</div>
+                        <div class="helpline-info">
+                            <h4>NIMHANS</h4>
+                            <p>National mental health helpline</p>
+                        </div>
+                        <a href="tel:080-46110007" class="helpline-number">080-46110007</a>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="tips-title">🧘 Calming Tips — Try These Right Now</div>
+                <div class="tips-grid">
+                    <div class="tip-card">
+                        <div class="tip-icon">🌬️</div>
+                        <div class="tip-content">
+                            <h4>4-7-8 Breathing</h4>
+                            <p>Breathe in for 4 seconds, hold for 7, breathe out slowly for 8. Repeat 3 times. This instantly calms your nervous system.</p>
+                        </div>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-icon">🖐️</div>
+                        <div class="tip-content">
+                            <h4>5-4-3-2-1 Grounding</h4>
+                            <p>Name 5 things you see, 4 you can touch, 3 you hear, 2 you smell, 1 you taste. This brings you back to the present moment.</p>
+                        </div>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-icon">💧</div>
+                        <div class="tip-content">
+                            <h4>Drink Cold Water</h4>
+                            <p>Splash cold water on your face or drink a cold glass slowly. It activates your body's calming reflex immediately.</p>
+                        </div>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-icon">✍️</div>
+                        <div class="tip-content">
+                            <h4>Write It Down</h4>
+                            <p>Write exactly how you feel without judging yourself. Getting feelings out of your head and onto paper reduces their power over you.</p>
+                        </div>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-icon">🤗</div>
+                        <div class="tip-content">
+                            <h4>Reach Out to Someone</h4>
+                            <p>Text or call one person you trust right now. You don't have to explain everything — just say "I need to talk." Connection heals.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+
+        <!-- EXAMPLE POSTS -->
+        <div class="section-label">Try an example</div>
+        <div class="example-posts">
+            <div class="example-post" onclick="setExample('I feel so sad and hopeless today, nothing makes me happy anymore')">
+                <div class="post-avatar" style="background:#2a0d0d;">😔</div>
+                <div class="post-content">
+                    <div class="post-header">
+                        <span class="post-name">Anonymous</span>
+                        <span class="post-handle">@user · 2m</span>
+                    </div>
+                    <div class="post-text">I feel so sad and hopeless today, nothing makes me happy anymore</div>
+                    <span class="post-tag tag-negative">Might be Negative</span>
+                </div>
+            </div>
+            <div class="example-post" onclick="setExample('I am so happy and grateful for everything in my life today!')">
+                <div class="post-avatar" style="background:#0d2a1f;">😊</div>
+                <div class="post-content">
+                    <div class="post-header">
+                        <span class="post-name">Anonymous</span>
+                        <span class="post-handle">@user · 5m</span>
+                    </div>
+                    <div class="post-text">I am so happy and grateful for everything in my life today!</div>
+                    <span class="post-tag tag-positive">Might be Positive</span>
+                </div>
+            </div>
+            <div class="example-post" onclick="setExample('Today was just a normal day, nothing special happened')">
+                <div class="post-avatar" style="background:#2a2200;">😐</div>
+                <div class="post-content">
+                    <div class="post-header">
+                        <span class="post-name">Anonymous</span>
+                        <span class="post-handle">@user · 10m</span>
+                    </div>
+                    <div class="post-text">Today was just a normal day, nothing special happened</div>
+                    <span class="post-tag tag-neutral">Might be Neutral</span>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
-        function setExample(text) {
-            document.getElementById('tweetInput').value = text;
+        // THEME TOGGLE
+        function toggleTheme() {
+            const html = document.documentElement;
+            const btn = document.getElementById('themeBtn');
+            if (html.getAttribute('data-theme') === 'dark') {
+                html.setAttribute('data-theme', 'light');
+                btn.textContent = '🌙 Dark';
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                btn.textContent = '☀️ Light';
+            }
         }
 
+        // CHAR COUNT
+        function updateCharCount() {
+            const input = document.getElementById('tweetInput');
+            const count = document.getElementById('charCount');
+            const remaining = 280 - input.value.length;
+            count.textContent = remaining;
+            count.className = 'char-count';
+            if (remaining < 50) count.classList.add('warning');
+            if (remaining < 20) count.classList.add('danger');
+        }
+
+        // SET EXAMPLE
+        function setExample(text) {
+            document.getElementById('tweetInput').value = text;
+            updateCharCount();
+            document.getElementById('tweetInput').focus();
+        }
+
+        // ANALYZE
         async function analyzeTweet() {
             const tweet = document.getElementById('tweetInput').value.trim();
-            
-            if (!tweet) {
-                showError('Please enter some text first!');
-                return;
-            }
+            if (!tweet) return;
 
             const btn = document.getElementById('analyzeBtn');
             const loading = document.getElementById('loading');
             const resultSection = document.getElementById('resultSection');
-            const errorMessage = document.getElementById('errorMessage');
+            const helpSection = document.getElementById('helpSection');
 
             btn.disabled = true;
             btn.textContent = 'Analyzing...';
             loading.style.display = 'block';
             resultSection.style.display = 'none';
-            errorMessage.style.display = 'none';
+            helpSection.style.display = 'none';
 
             try {
                 const response = await fetch('/analyze', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ tweet: tweet })
+                    body: JSON.stringify({ tweet })
                 });
 
                 const data = await response.json();
 
-                if (data.error) {
-                    showError(data.error);
-                } else {
-                    showResult(data);
+                if (!data.error) {
+                    // Show tweet text
+                    document.getElementById('resultTweetText').textContent = tweet;
+
+                    // Show result card
+                    const card = document.getElementById('resultCard');
+                    card.className = 'result-card ' + data.color;
+                    document.getElementById('resultEmoji').textContent = data.emoji;
+                    document.getElementById('resultLabel').textContent = data.result;
+                    document.getElementById('resultMessage').textContent = data.message;
+
+                    resultSection.style.display = 'block';
+
+                    // Show help section only for negative
+                    if (data.color === 'negative') {
+                        helpSection.style.display = 'block';
+                    }
+
+                    // Scroll to result
+                    resultSection.scrollIntoView({ behavior: 'smooth' });
                 }
 
             } catch (error) {
-                showError('Something went wrong. Please try again!');
+                console.error(error);
             } finally {
                 btn.disabled = false;
-                btn.textContent = '🔍 Analyze Sentiment';
+                btn.textContent = 'Analyze';
                 loading.style.display = 'none';
             }
         }
 
-        function showResult(data) {
-            const resultSection = document.getElementById('resultSection');
-            const resultCard = document.getElementById('resultCard');
-            const resultEmoji = document.getElementById('resultEmoji');
-            const resultLabel = document.getElementById('resultLabel');
-            const resultMessage = document.getElementById('resultMessage');
-
-            resultCard.className = 'result-card ' + data.color;
-            resultEmoji.textContent = data.emoji;
-            resultLabel.textContent = data.result;
-            resultMessage.textContent = data.message;
-
-            resultSection.style.display = 'block';
-        }
-
-        function showError(message) {
-            const errorMessage = document.getElementById('errorMessage');
-            errorMessage.textContent = message;
-            errorMessage.style.display = 'block';
-        }
-
-        document.getElementById('tweetInput').addEventListener('keydown', function(e) {
-            if (e.ctrlKey && e.key === 'Enter') {
-                analyzeTweet();
-            }
+        // ENTER KEY
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('tweetInput').addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.key === 'Enter') analyzeTweet();
+            });
         });
     </script>
 </body>
