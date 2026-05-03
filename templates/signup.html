@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindX - Sign Up</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #000000;
+            color: #e7e9ea;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 40px;
+            font-weight: 900;
+            margin-bottom: 24px;
+            color: #e7e9ea;
+        }
+
+        .logo span { color: #1d9bf0; }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #71767b;
+            font-size: 15px;
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .form-group { margin-bottom: 14px; }
+
+        label {
+            display: block;
+            font-size: 13px;
+            color: #71767b;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 16px;
+            background: #000000;
+            border: 1px solid #2f3336;
+            border-radius: 8px;
+            color: #e7e9ea;
+            font-size: 16px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus { border-color: #1d9bf0; }
+        input::placeholder { color: #3f4447; }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+            margin-top: 8px;
+            transition: opacity 0.2s;
+        }
+
+        .btn:hover { opacity: 0.9; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .btn-primary {
+            background: #1d9bf0;
+            color: white;
+        }
+
+        .error-msg {
+            background: #2a0d0d;
+            border: 1px solid #4a1a1a;
+            color: #f87171;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 16px;
+            display: none;
+            text-align: center;
+        }
+
+        .success-msg {
+            background: #0d2a1f;
+            border: 1px solid #1a4731;
+            color: #4ade80;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 16px;
+            display: none;
+            text-align: center;
+        }
+
+        .footer-text {
+            text-align: center;
+            margin-top: 24px;
+            color: #71767b;
+            font-size: 14px;
+        }
+
+        .footer-text a {
+            color: #1d9bf0;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer-text a:hover { text-decoration: underline; }
+
+        .brain-icon {
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .terms {
+            font-size: 12px;
+            color: #71767b;
+            text-align: center;
+            margin-top: 16px;
+            line-height: 1.5;
+        }
+
+        .terms a { color: #1d9bf0; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="brain-icon">🧠</div>
+        <div class="logo">Mind<span>X</span></div>
+
+        <h1>Create your account</h1>
+        <p class="subtitle">Join MindX — share, connect and stay well</p>
+
+        <div class="error-msg" id="errorMsg"></div>
+        <div class="success-msg" id="successMsg"></div>
+
+        <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="name" placeholder="Your full name" />
+        </div>
+
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="username" placeholder="@username (no spaces)" />
+        </div>
+
+        <div class="form-group">
+            <label>Email address</label>
+            <input type="email" id="email" placeholder="your@email.com" />
+        </div>
+
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="Min 6 characters"
+                onkeydown="if(event.key==='Enter') signup()" />
+        </div>
+
+        <button class="btn btn-primary" onclick="signup()" id="signupBtn">
+            Create account
+        </button>
+
+        <p class="terms">
+            By signing up you agree to our Terms of Service and Privacy Policy.
+            MindX uses AI to detect sentiment — not a substitute for professional help.
+        </p>
+
+        <div class="footer-text" style="margin-top:16px;">
+            Already have an account?
+            <a href="/login">Sign in here</a>
+        </div>
+    </div>
+
+    <script>
+        async function signup() {
+            const name = document.getElementById('name').value.trim();
+            const username = document.getElementById('username').value.trim().replace('@', '');
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('signupBtn');
+            const errorMsg = document.getElementById('errorMsg');
+            const successMsg = document.getElementById('successMsg');
+
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+
+            if (!name || !username || !email || !password) {
+                showError('Please fill in all fields!');
+                return;
+            }
+
+            if (password.length < 6) {
+                showError('Password must be at least 6 characters!');
+                return;
+            }
+
+            if (username.includes(' ')) {
+                showError('Username cannot contain spaces!');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Creating account...';
+
+            try {
+                const response = await fetch('/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, username, email, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    successMsg.textContent = '🎉 Account created! Taking you to MindX...';
+                    successMsg.style.display = 'block';
+                    setTimeout(() => window.location.href = '/feed', 1500);
+                } else {
+                    showError(data.error);
+                }
+            } catch (e) {
+                showError('Something went wrong. Please try again!');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Create account';
+            }
+        }
+
+        function showError(msg) {
+            const errorMsg = document.getElementById('errorMsg');
+            errorMsg.textContent = msg;
+            errorMsg.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
